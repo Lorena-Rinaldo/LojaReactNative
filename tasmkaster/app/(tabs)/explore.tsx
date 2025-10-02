@@ -22,27 +22,16 @@ router.back() → volta para a tela anterior.
     <View style={styles.container}>
       <Text style={styles.title}>Página de task</Text>
       <Text style={styles.subtitle}>segunda página!</Text>
-      {/* <Button
-        title="Ir para beltranis (fora das Tabs)"
-        onPress={() => router.push("/beltranis")} //tem que ter uma variável antes
-      //  para recever o useRouter o "const router"é para isso
-      /> */}
-      {/* <Button
+      <Button
+              title="Ir para beltranis (fora das Tabs)"
+              onPress={() => router.push("/shopcart")} //tem que ter uma variável antes
+              //  para recever o useRouter o "const router"é para isso
+            />
+      <Button
         title="Ir para xulambs (fora das Tabs)"
         onPress={() => router.push("/xulambs")}
-
-      /> */}
-      <Button
-        title="Ir para ciclanis (fora das Tabs)"
-        onPress={() => router.push("/ciclanis")}
-
-      />
-
-      <Button
-        title="Ir para fulanis (fora das Tabs)"
-        onPress={() => router.push("/fulanis")}
-
-      />
+        
+      />    
 
     </View>
   );

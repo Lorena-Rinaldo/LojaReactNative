@@ -7,18 +7,18 @@ import 'react-native-reanimated';
 
 
 export default function RootLayout() { //conexão entre as stack navigation
-  //  e tab navigation, xulambs, beltranis, etc qualqer tela fora da tab navigation, estará aqui
-
+//  e tab navigation, xulambs, beltranis, etc qualqer tela fora da tab navigation, estará aqui
+  
   return (
     <ThemeProvider value={DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
         <Stack.Screen name="xulambs" />
-        <Stack.Screen name="beltranis" />
+        <Stack.Screen name="shopcart" />
+        <Stack.Screen name="checkout" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
   );
-
 }
