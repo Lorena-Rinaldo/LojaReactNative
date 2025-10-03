@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,10 @@ import {
   TouchableOpacity,
   Linking,
   ScrollView,
+  Modal,
+  Pressable,
 } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 type OrderItem = {
@@ -21,6 +23,7 @@ const formatPrice = (value: number) => `R$ ${value.toFixed(2)}`;
 
 export default function Checkout() {
   const params = useLocalSearchParams();
+  const router = useRouter();
 
   const total = parseFloat((params.total as string) || '0');
 
@@ -36,6 +39,18 @@ export default function Checkout() {
 
   const openLink = (url: string) => {
     Linking.openURL(url);
+  };
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleConfirmPayment = () => {
+    setModalVisible(true);
+
+    // Após 2 segundos, fecha o modal e navega para a tela inicial
+    setTimeout(() => {
+      setModalVisible(false);
+      router.push('/'); // Voltar para tela inicial (ajuste o path se precisar)
+    }, 2000);
   };
 
   return (
@@ -123,7 +138,7 @@ export default function Checkout() {
         </View>
       </ScrollView>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={handleConfirmPayment}>
         <Ionicons
           name="checkmark-circle-outline"
           size={20}
@@ -132,6 +147,27 @@ export default function Checkout() {
         />
         <Text style={styles.buttonText}>Confirmar Pagamento</Text>
       </TouchableOpacity>
+
+      {/* Modal de agradecimento */}
+      <Modal
+        animationType="fade"
+        transparent
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Ionicons name="checkmark-circle" size={64} color="#4CAF50" />
+            <Text style={styles.modalText}>Obrigado pela sua compra! 🎉</Text>
+            <Pressable
+              onPress={() => setModalVisible(false)}
+              style={styles.modalButton}
+            >
+              <Text style={styles.modalButtonText}>Fechar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -240,5 +276,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 6,
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: '#FFF',
+    padding: 30,
+    borderRadius: 12,
+    alignItems: 'center',
+    width: '80%',
+    elevation: 5,
+  },
+  modalText: {
+    marginTop: 15,
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+    textAlign: 'center',
+  },
+  modalButton: {
+    marginTop: 25,
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+  },
+  modalButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
