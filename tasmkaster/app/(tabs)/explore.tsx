@@ -1,6 +1,7 @@
 // App.js básico com componentes fundamentais
 import { View, Text, StyleSheet, Button } from 'react-native';
 import { useRouter } from 'expo-router';
+import React from 'react';
 
 export default function Task() {
   const router = useRouter();
@@ -23,13 +24,13 @@ router.back() → volta para a tela anterior.
       <Text style={styles.title}>Página de task</Text>
       <Text style={styles.subtitle}>segunda página!</Text>
       <Button
-              title="Ir para beltranis (fora das Tabs)"
+              title="Ir para Carrinho"
               onPress={() => router.push("/shopcart")} //tem que ter uma variável antes
               //  para recever o useRouter o "const router"é para isso
             />
       <Button
-        title="Ir para xulambs (fora das Tabs)"
-        onPress={() => router.push("/xulambs")}
+        title="Ir para Jogo"
+        onPress={() => router.push("/jogo")}
         
       />    
 

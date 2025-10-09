@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  Image, 
-  FlatList, 
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  FlatList,
   TouchableOpacity,
-  Alert 
+  Alert
 } from 'react-native';
 import { useRouter } from 'expo-router';
 
@@ -50,12 +50,7 @@ const MOCK_PRODUCTS = [
 ];
 
 
-/**
-
- * @param {number} value 
- * @returns {string} 
- */
-const formatPrice = (value) => {
+const formatPrice = (value: string | number | bigint) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
@@ -64,26 +59,42 @@ const formatPrice = (value) => {
 };
 
 const ProductCard = ({ product }) => {
+  const router = useRouter();
+
   const handleBuy = useCallback(() => {
+
+    const productToCart = {
+      id: product.id,
+      title: product.title,
+      price: product.price,
+    };
+
+    router.push({
+      pathname: '/shopcart',
+      params: {
+        productData: JSON.stringify(productToCart)
+      }
+    });
+
     Alert.alert(
       'Adicionado ao Carrinho',
-      `${product.title} foi adicionado com sucesso!`,
+      `${product.title} foi adicionado com sucesso! Redirecionando...`,
       [{ text: 'OK' }]
     );
-  }, [product.title]);
+  }, [product, router]);
 
   return (
     <View style={styles.card}>
       <Image
         source={{ uri: product.imageUri }}
         style={styles.image}
-        resizeMode="contain" 
+        resizeMode="contain"
       />
       <Text style={styles.title} numberOfLines={2}>{product.title}</Text>
       <Text style={styles.price}>{formatPrice(product.price)}</Text>
-      
-      <TouchableOpacity 
-        style={styles.buyButton} 
+
+      <TouchableOpacity
+        style={styles.buyButton}
         onPress={handleBuy}
       >
         <Text style={styles.buyButtonText}>Comprar</Text>
@@ -93,7 +104,6 @@ const ProductCard = ({ product }) => {
 };
 
 export default function ProductListScreen() {
-  const router = useRouter();
 
   const renderProduct = useCallback(({ item }) => (
     <ProductCard product={item} />
@@ -102,10 +112,10 @@ export default function ProductListScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.headerTitle}>Catálogo de Eletrônicos</Text>
-      
+
       <FlatList
-        data={MOCK_PRODUCTS} 
-        renderItem={renderProduct} 
+        data={MOCK_PRODUCTS}
+        renderItem={renderProduct}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.feed}
         numColumns={2}
@@ -118,13 +128,13 @@ export default function ProductListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5', 
+    backgroundColor: '#f5f5f5',
     paddingTop: 16,
   },
-  headerTitle: { 
+  headerTitle: {
     fontSize: 28,
     marginBottom: 20,
-    fontWeight: '700', 
+    fontWeight: '700',
     textAlign: 'center',
     color: '#333',
   },
@@ -137,26 +147,26 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   card: {
-    width: '48%', 
-    marginVertical: 8, 
+    width: '48%',
+    marginVertical: 8,
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 12,
     alignItems: 'center',
-  
+
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 10,
     elevation: 5,
   },
-  image: { 
+  image: {
     width: '100%',
     height: 120,
     marginBottom: 10,
     borderRadius: 8,
   },
-  title: { 
+  title: {
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 4,
@@ -165,12 +175,12 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 18,
-    color: '#007bff', 
+    color: '#007bff',
     fontWeight: 'bold',
     marginBottom: 10,
   },
   buyButton: {
-    backgroundColor: '#28a745', 
+    backgroundColor: '#28a745',
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 6,

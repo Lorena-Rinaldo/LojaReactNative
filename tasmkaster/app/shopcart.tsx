@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
 type CartItem = {
   id: string;
@@ -31,11 +31,44 @@ const renderItem = ({ item, increase, decrease }: { item: CartItem, increase: (i
 
 export default function Cart() {
   const router = useRouter();
+  const params = useLocalSearchParams();
 
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    { id: '1', name: 'Tênis Esportivo', price: 199.9, quantity: 1 },
-    { id: '2', name: 'Camiseta Dry Fit', price: 89.9, quantity: 2 },
-  ]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+
+  const addItemToCart = useCallback((newItem: { id: string, title: string, price: number }) => {
+    setCartItems(prevItems => {
+      const existingItemIndex = prevItems.findIndex(item => item.id === newItem.id);
+
+      if (existingItemIndex > -1) {
+        return prevItems.map((item, index) =>
+          index === existingItemIndex
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        return [
+          ...prevItems,
+          {
+            id: newItem.id,
+            name: newItem.title,
+            price: newItem.price,
+            quantity: 1,
+          },
+        ];
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (params.productData) {
+      try {
+        const product = JSON.parse(params.productData as string);
+        addItemToCart(product);
+      } catch (e) {
+        console.error("Erro ao fazer parse ou adicionar produto:", e);
+      }
+    }
+  }, [params.productData, addItemToCart]);
 
   const increaseQuantity = (id: string) => {
     setCartItems((prevItems) =>
@@ -68,7 +101,6 @@ export default function Cart() {
       total: getTotal(cartItems),
     };
 
-    // Serializando e codificando os itens para passar via URL
     const encodedItems = encodeURIComponent(JSON.stringify(purchaseDetails.items));
 
     router.push({
@@ -79,7 +111,6 @@ export default function Cart() {
       },
     });
 
-    // Limpa o carrinho após a navegação
     setCartItems([]);
 
   }, [cartItems, router]);
@@ -92,16 +123,24 @@ export default function Cart() {
     <View style={styles.container}>
       <Text style={styles.title}>🛒 Carrinho de Compras</Text>
 
-      <FlatList
-        data={cartItems}
-        keyExtractor={(item) => item.id}
-        renderItem={itemRenderer}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      />
+      {cartItems.length === 0 ? (
+        <Text style={styles.emptyCartText}>Seu carrinho está vazio. Adicione um produto!</Text>
+      ) : (
+        <FlatList
+          data={cartItems}
+          keyExtractor={(item) => item.id}
+          renderItem={itemRenderer}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        />
+      )}
 
       <View style={styles.footer}>
         <Text style={styles.total}>Total: R$ {getTotal(cartItems).toFixed(2)}</Text>
-        <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
+        <TouchableOpacity
+          style={styles.checkoutButton}
+          onPress={handleCheckout}
+          disabled={cartItems.length === 0}
+        >
           <Text style={styles.checkoutText} >Finalizar Compra</Text>
         </TouchableOpacity>
       </View>
@@ -132,4 +171,10 @@ const styles = StyleSheet.create({
     borderRadius: 8, width: '100%', alignItems: 'center',
   },
   checkoutText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
+  emptyCartText: {
+    textAlign: 'center',
+    marginTop: 50,
+    fontSize: 16,
+    color: '#666',
+  },
 });
